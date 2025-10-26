@@ -1,38 +1,36 @@
+import Login from '../support/helpers/Login'
+import LoginData from '../fixtures/login/LoginData.json'
+
 describe('Login', () => {
-  beforeEach(() => {
-    cy.visit('https://automationexercise.com')
-    cy.contains('a', 'Signup / Login').click()
-  })
+    beforeEach(() => {
+        cy.visit('/')
+        Login.accessPageViaMenu()
+    })
 
-  it('Test Case 2: Login User with correct email and password', () => {
-    cy.contains('h2', 'Login to your account').should('be.visible')
-    cy.get('[data-qa=login-email]').type('pgats-user@email.com')
-    cy.get('[data-qa=login-password]').type('123456')
-    cy.contains('button', 'Login').click()
+    it('Test Case 2: Login User with correct email and password', () => {
+        const user = LoginData.validUser
 
-    cy.contains('Logged in as pgats-user777').should('be.visible')
-    cy.contains('a', 'Logout').should('be.visible')
-  })
+        Login.doLogin(user.email, user.password)
 
-  it('Test Case 3: Login User with incorrect email and password', () => {
-    cy.contains('h2', 'Login to your account').should('be.visible')
-    cy.get('[data-qa=login-email]').type('pgats-user@email.com')
-    cy.get('[data-qa=login-password]').type('1234567')
-    cy.contains('button', 'Login').click()
+        cy.contains(`Logged in as ${user.name}`).should('be.visible')
+        cy.contains('a', 'Logout').should('be.visible')
+    })
 
-    cy.contains('Your email or password is incorrect!').should('be.visible')
-  })
+    it('Test Case 3: Login User with incorrect email and password', () => {
+        const user = ({...LoginData.validUser, password: 'wrongpassword'})
 
-  it('Test Case 4: Logout User', () => {
-    cy.contains('h2', 'Login to your account').should('be.visible')
-    cy.get('[data-qa=login-email]').type('pgats-user@email.com')
-    cy.get('[data-qa=login-password]').type('123456')
-    cy.contains('button', 'Login').click()
+        Login.doLogin(user.email, user.password)
 
-    cy.contains('Logged in as pgats-user777').should('be.visible')
-    
-    cy.contains('a', 'Logout').click()
-    cy.contains('a', 'Signup / Login').should('be.visible')
-  })
+        cy.contains('Your email or password is incorrect!').should('be.visible')
+    })
 
+    it('Test Case 4: Logout User', () => {
+        const user = LoginData.validUser
+
+        Login.doLogin(user.email, user.password)
+
+        cy.contains(`Logged in as ${user.name}`).should('be.visible')
+        cy.contains('a', 'Logout').click()
+        cy.contains('a', 'Signup / Login').should('be.visible')
+    })
 })
